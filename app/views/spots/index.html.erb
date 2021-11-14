@@ -1,0 +1,93 @@
+<div class="main_container d-flex h-100%">
+  <div class="sidebar d-flex border">
+    <div class="first">
+      <table class="table hover small">
+        <thead>
+          <th>名称</th>
+          <th>住所</th>
+          <th>いいね</th>
+        </thead>
+        <% @spots.each do |spot| %>
+        <tr>
+          <td><%= link_to spot_path(spot.id) do %><%= spot.name %><% end %></td>
+          <td><%= spot.address %></td>
+          <td><%= link_to spot_favorites_path(spot.id),method: :post do %><i class="far fa-heart"></i><% end %></td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
+    <div class="second d-flex flex-wrap">
+      <div class="icon w-100 h-25 pt-5 text-center rounded shadow-sm"><i class="fas fa-search fa-2x"></i></div>
+      <div class="icon w-100 h-25 pt-5 text-center rounded shadow-sm"><i class="fas fa-heart fa-2x"></i></div>
+      <div class="icon w-100 h-25 pt-5 text-center rounded shadow-sm"><%= link_to new_spot_path do %><i class="fas fa-plus fa-2x"></i><% end %></div>
+      <div class="icon w-100 h-25 pt-5 text-center rounded shadow-sm"><i class="fas fa-user fa-2x"></i></div>
+    </div>
+  </div>
+
+  <div class="mainbar">
+    <!-- 地名入力用のinputを追加 -->
+    <input id="address" type="textbox" value="東京都品川区">
+    <!-- buttonをクリックしたらcodeAddressを実行　-->
+    <input type="button" value="検索" onclick="codeAddress()">
+    <div id="map"></div>
+  </div>
+
+</div>
+  <script>
+      let map;
+      let marker=[];
+      let infoWindow=[];
+      const spots=gon.spots;
+
+      function initMap(){
+        geocoder = new google.maps.Geocoder()
+
+          map=new google.maps.Map(document.getElementById("map"),{
+          zoom:10,
+          center: { lat: 35.6585, lng: 139.7486 },
+          mapId: "1b786f15acc7b7be"
+        });
+
+        for(let i=0;i<spots.length;i++){
+
+          markerLatLng=new google.maps.LatLng({
+            lat:spots[i]["latitude"],
+            lng:spots[i]["longitude"]
+          });
+          icon_clay="/assets/clay.png"
+          icon_omuni="/assets/omuni.png"
+          icon_hard="/assets/hard.png"
+          marker[i]=new google.maps.Marker({
+            position:markerLatLng,
+            map:map,
+            icon:icon_hard
+
+          });
+
+          infoWindow[i]=new google.maps.InfoWindow({
+            content:spots[i]["address"],
+          });
+
+          marker[i].addListener('click',function(){
+          infoWindow[i].open(map,marker[i]);
+          });
+        }
+      }
+
+    function codeAddress(){
+  // 入力を取得
+  let inputAddress = document.getElementById('address').value;
+
+  // geocodingしたあとmapを移動
+  geocoder.geocode( { 'address': inputAddress}, function(results, status) {
+    if (status == 'OK') {
+　// map.setCenterで地図が移動
+      map.setCenter(results[0].geometry.location);
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+  </script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAP_API_KEY'] %>&callback=initMap" async defer></script>

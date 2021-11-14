@@ -1,0 +1,24 @@
+// Place all the styles related to the spots controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.icon:hover{
+  color:gray;
+}
+.first{
+  width:90%;
+}
+.second{
+  width:10%;
+}
+.sidebar{
+  width:35%;
+}
+.mainbar{
+  width:65%;
+}
+#map{
+  height:600px;
+}
+.label{
+  font-weight:bold;
+}
